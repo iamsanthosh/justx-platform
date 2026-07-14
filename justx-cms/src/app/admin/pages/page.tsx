@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { listPages } from "@/lib/data/pages";
+import { requirePagePermission } from "@/lib/rbac";
 
 export default async function AdminPagesList() {
+  await requirePagePermission("pages:read");
   const pages = await listPages();
 
   return (

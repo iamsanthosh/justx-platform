@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPageForEditing } from "@/lib/data/pages";
+import { requirePagePermission } from "@/lib/rbac";
 import SectionsBoard from "./SectionsBoard";
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default async function PageEditor({ params }: Props) {
+  await requirePagePermission("sections:read");
   const { id } = await params;
   const page = await getPageForEditing(id);
   if (!page) notFound();

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requirePagePermission } from "@/lib/rbac";
 
 interface EnquiryRow {
   id: string;
@@ -10,6 +11,8 @@ interface EnquiryRow {
 }
 
 export default async function EnquiriesPage() {
+  await requirePagePermission("enquiries:read");
+
   const enquiries = await prisma.enquiry.findMany({
     orderBy: { createdAt: "desc" },
     take: 50,

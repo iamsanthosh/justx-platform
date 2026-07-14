@@ -217,6 +217,21 @@ enum SubmissionStatus {
 }
 
 // ─────────────────────────────────────────────
+// SITE SETTINGS
+// ─────────────────────────────────────────────
+
+// Simple key-value store for global settings (site title, default SEO
+// meta, social links, etc.) — deliberately not a rigid schema so new
+// settings can be added from the admin UI without a migration.
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+// ─────────────────────────────────────────────
 // CONTENT: TESTIMONIALS, CLIENTS, ENQUIRIES
 // ─────────────────────────────────────────────
 

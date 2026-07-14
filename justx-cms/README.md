@@ -8,30 +8,43 @@ roadmap: foundation (auth, schema, security) and the public rendering engine
 
 - Next.js 15 (App Router) + TypeScript, Tailwind CSS
 - MySQL schema via Prisma: Users/Roles/RBAC, Pages, Sections (component
-  registry), Menus, Media, Forms, Testimonials, Clients, Enquiries, Audit Log
+  registry), Menus, Media, Forms, Testimonials, Clients, Enquiries, Settings,
+  Audit Log
 - JWT (jose, edge-safe) + HttpOnly cookie auth, bcrypt password hashing
 - Section-based CMS (not a generic drag-and-drop builder — see "Design
   decisions" below) with 16 section types seeded from the real JustX v4 site
   content: Hero, Metrics, Problems, Services, AI Feature, Ecosystem, Vision,
   Why Us, Delivery, Industries, Testimonials, Gallery, FAQ, CTA, Contact, Footer
 - Admin dashboard: pages list, per-page section board (enable / disable /
-  reorder / duplicate / delete / draft-publish / edit content), enquiries inbox
+  reorder / duplicate / delete / draft-publish / edit content), media
+  library (upload with automatic image optimization + dimension extraction
+  via sharp, alt text, delete), testimonials & clients managers, enquiries
+  inbox, forms engine (unlimited dynamic forms — build fields visually, each
+  form gets its own `/api/forms/submit/<key>` endpoint validated against its
+  own field schema, submissions inbox with status/notes, one-click CSV
+  export), menus admin (add/reorder/delete primary nav items), user
+  management (Super Admin only — create/disable/delete accounts, assign
+  roles), site settings (title, default meta description, contact email)
 - Public site: dynamic page rendering by slug, contact form wired to a real
   API route + DB storage + SMTP notification, sitemap.xml, robots.txt,
   per-page SEO metadata
-- Security: in-memory rate limiting (login + enquiry endpoints), Zod
-  validation on every write path, RBAC permission checks on every admin API
-  route, audit logging, honeypot field on the contact form
+- Security: in-memory rate limiting (login, enquiry, and form-submission
+  endpoints), Zod validation on every write path (including runtime-built
+  schemas per form definition), RBAC permission checks on every admin API
+  route *and* every admin page that reads data directly (page-level guard via
+  `requirePagePermission`, separate from the API-level `requirePermission`),
+  audit logging, honeypot fields on both the contact form and the generic
+  forms engine
 - Winston logging, standalone Next.js output (`output: "standalone"`) sized
   for a 1 vCPU / 4 GB VPS
 
 ## Not yet built (next milestones)
 
-Media library UI, forms engine (multi-form builder + CSV export), full Menus
-admin UI, Users/Roles/Careers/SEO/Settings admin screens, automated test
-suites (Vitest/Playwright — devDependencies are already in `package.json`),
-deployment scripts, and the remaining static pages (About, Services, etc. —
-currently seeded as empty draft shells so slugs/routes exist).
+Careers module, automated test suites (Vitest/Playwright —
+devDependencies are already in `package.json`), deployment scripts, and the
+remaining static pages (About, Services, etc. — currently seeded as empty
+draft shells so slugs/routes exist). Secondary menus (only `primary-nav` has
+an admin UI so far; the schema supports unlimited menus).
 
 ## Design decisions worth knowing about
 
