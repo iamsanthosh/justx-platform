@@ -1,0 +1,64 @@
+{
+  "name": "justx-cms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "JustX CMS v1.0 - Enterprise website + CMS platform for JustX Systems",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "3.9.1",
+    "@prisma/client": "5.22.0",
+    "@tanstack/react-table": "8.20.6",
+    "bcryptjs": "2.4.3",
+    "clsx": "2.1.1",
+    "framer-motion": "11.15.0",
+    "jose": "5.9.6",
+    "lucide-react": "0.469.0",
+    "next": "15.5.20",
+    "nodemailer": "6.9.16",
+    "prisma": "5.22.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-hook-form": "7.54.2",
+    "recharts": "2.15.0",
+    "sharp": "0.33.5",
+    "winston": "3.17.0",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@playwright/test": "1.51.1",
+    "@testing-library/react": "16.1.0",
+    "@types/bcryptjs": "2.4.6",
+    "@types/node": "22.10.5",
+    "@types/nodemailer": "6.4.17",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "@vitejs/plugin-react": "4.3.4",
+    "autoprefixer": "10.4.20",
+    "eslint": "9.17.0",
+    "eslint-config-next": "15.5.20",
+    "postcss": "8.4.49",
+    "tailwindcss": "3.4.17",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

@@ -1,0 +1,265 @@
+// JustX CMS v1.0 - Prisma schema
+// Database: MySQL (Hostinger VPS compatible)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// AUTH & RBAC
+// ─────────────────────────────────────────────
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique // e.g. SUPER_ADMIN, EDITOR, VIEWER
+  description String?  @db.Text
+  permissions Json      // array of permission strings, e.g. ["pages:edit","media:upload"]
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  roleId       String
+  role         Role      @relation(fields: [roleId], references: [id])
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  auditLogs    AuditLog[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([roleId])
+  @@map("users")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String   // e.g. "SECTION_UPDATED", "LOGIN_SUCCESS"
+  entity    String?  // e.g. "Section"
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+// ─────────────────────────────────────────────
+// PAGE BUILDER / CMS
+// ─────────────────────────────────────────────
+
+model Page {
+  id            String    @id @default(cuid())
+  slug          String    @unique // "", "about", "services", ...
+  title         String
+  metaTitle     String?
+  metaDesc      String?   @db.Text
+  ogImage       String?
+  status        PageStatus @default(DRAFT)
+  sections      Section[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("pages")
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// Component registry: each Section row is one instance of a component type,
+// bound to a page, with structured JSON content validated against a
+// per-type Zod schema (see src/lib/validation/sections.ts).
+model Section {
+  id        String        @id @default(cuid())
+  pageId    String
+  page      Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type      SectionType
+  content   Json          // structured content, shape depends on `type`
+  order     Int           @default(0)
+  enabled   Boolean       @default(true)
+  status    SectionStatus @default(PUBLISHED)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([pageId])
+  @@index([pageId, order])
+  @@map("sections")
+}
+
+enum SectionStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum SectionType {
+  HERO
+  METRICS
+  PROBLEMS
+  SERVICES
+  AI_FEATURE
+  ECOSYSTEM
+  VISION
+  WHY_US
+  DELIVERY
+  INDUSTRIES
+  TESTIMONIALS
+  GALLERY
+  FAQ
+  CTA
+  CONTACT
+  FOOTER
+}
+
+// ─────────────────────────────────────────────
+// MENUS
+// ─────────────────────────────────────────────
+
+model Menu {
+  id        String     @id @default(cuid())
+  key       String     @unique // e.g. "primary-nav", "footer-nav"
+  label     String
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("menus")
+}
+
+model MenuItem {
+  id        String     @id @default(cuid())
+  menuId    String
+  menu      Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  label     String
+  href      String
+  order     Int        @default(0)
+  parentId  String?
+  parent    MenuItem?  @relation("MenuItemChildren", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children  MenuItem[] @relation("MenuItemChildren")
+
+  @@index([menuId])
+  @@map("menu_items")
+}
+
+// ─────────────────────────────────────────────
+// MEDIA LIBRARY
+// ─────────────────────────────────────────────
+
+model Media {
+  id           String   @id @default(cuid())
+  filename     String
+  url          String
+  mimeType     String
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  altText      String?
+  folder       String   @default("uploads")
+  createdAt    DateTime @default(now())
+
+  @@index([folder])
+  @@map("media")
+}
+
+// ─────────────────────────────────────────────
+// FORMS
+// ─────────────────────────────────────────────
+
+model FormDef {
+  id          String       @id @default(cuid())
+  key         String       @unique // e.g. "contact-page-form"
+  name        String
+  fields      Json         // array of {name, label, type, required, options?}
+  notifyEmail String?
+  submissions FormSubmission[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("form_defs")
+}
+
+model FormSubmission {
+  id         String        @id @default(cuid())
+  formId     String
+  form       FormDef       @relation(fields: [formId], references: [id], onDelete: Cascade)
+  data       Json
+  status     SubmissionStatus @default(NEW)
+  notes      String?       @db.Text
+  ipAddress  String?
+  createdAt  DateTime      @default(now())
+
+  @@index([formId])
+  @@index([status])
+  @@map("form_submissions")
+}
+
+enum SubmissionStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  SPAM
+}
+
+// ─────────────────────────────────────────────
+// CONTENT: TESTIMONIALS, CLIENTS, ENQUIRIES
+// ─────────────────────────────────────────────
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  author    String
+  role      String?
+  company   String?
+  quote     String   @db.Text
+  avatarUrl String?
+  enabled   Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("testimonials")
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  logoUrl   String
+  website   String?
+  enabled   Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@map("clients")
+}
+
+// General-purpose enquiry inbox (separate from FormSubmission, used for the
+// primary "Contact" section which is always present on the site).
+model Enquiry {
+  id        String          @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  company   String?
+  message   String          @db.Text
+  status    SubmissionStatus @default(NEW)
+  notes     String?         @db.Text
+  ipAddress String?
+  createdAt DateTime        @default(now())
+
+  @@index([status])
+  @@map("enquiries")
+}
