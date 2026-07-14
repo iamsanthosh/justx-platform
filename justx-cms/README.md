@@ -40,11 +40,33 @@ roadmap: foundation (auth, schema, security) and the public rendering engine
 
 ## Not yet built (next milestones)
 
-Careers module, automated test suites (Vitest/Playwright —
-devDependencies are already in `package.json`), deployment scripts, and the
-remaining static pages (About, Services, etc. — currently seeded as empty
-draft shells so slugs/routes exist). Secondary menus (only `primary-nav` has
-an admin UI so far; the schema supports unlimited menus).
+Careers module and the remaining static pages (About, Services, etc. —
+currently seeded as empty draft shells so slugs/routes exist). Secondary
+menus (only `primary-nav` has an admin UI so far; the schema supports
+unlimited menus).
+
+## Testing
+
+**Unit tests (Vitest)** — real, currently passing (34 tests): validation
+schemas for sections/enquiry/forms (including the forms engine's
+runtime-built Zod schema), the in-memory rate limiter, and JWT session
+sign/verify.
+
+```bash
+npm test
+```
+
+**E2E tests (Playwright)** — public site smoke tests (homepage render, nav,
+contact form validation, 404, robots/sitemap) and the full admin auth flow
+(redirect-when-unauthenticated, invalid login, successful login, logout).
+These spin up the production build via `webServer` in `playwright.config.ts`,
+so they need a real database behind `DATABASE_URL` and a seeded admin user
+— they aren't runnable in a sandbox without MySQL, but will run against a
+real dev/staging environment:
+
+```bash
+npm run test:e2e
+```
 
 ## Design decisions worth knowing about
 
@@ -68,6 +90,9 @@ an admin UI so far; the schema supports unlimited menus).
 ## Verified in this environment
 
 - `npx eslint .` — 0 errors, 0 warnings
+- `npx tsc --noEmit` — 0 errors (whole project, including `prisma/seed.ts` and
+  the test suite)
+- `npm test` (Vitest) — 34/34 unit tests passing
 - `npx next build` — TypeScript compiles cleanly and lint passes; the build
   gets as far as "Collecting page data" and then fails because
   `@prisma/client` hasn't been generated. That's expected: generating the
@@ -98,16 +123,26 @@ Admin dashboard: `/admin/login` → `/admin/dashboard`.
 
 ## Deploying to a Hostinger VPS (Node + PM2 + Nginx + MySQL)
 
+Automated via `deploy.sh` + `ecosystem.config.js`:
+
 1. Provision MySQL, create a database + user, put the connection string in
-   `DATABASE_URL`.
-2. On the VPS: `git clone` (or upload) the repo, `npm install --production=false`,
-   `npx prisma generate`, `npx prisma migrate deploy`, `npm run seed` (first
-   deploy only), `npm run build`.
-3. Run with PM2: `pm2 start npm --name justx-cms -- start`, `pm2 save`,
-   `pm2 startup`.
-4. Put Nginx in front as a reverse proxy to `localhost:3000`, then issue a
-   Let's Encrypt cert with `certbot`.
-5. Set `NODE_ENV=production` and a strong, unique `JWT_SECRET`.
+   `DATABASE_URL`. Clone the repo onto the VPS, `cp .env.example .env` and
+   fill in real values (strong unique `JWT_SECRET`, SMTP creds, etc.).
+2. First deploy: `./deploy.sh --first-run` — installs dependencies,
+   generates the Prisma client, runs migrations, seeds initial data (roles +
+   admin user + home page), builds, copies static assets into the
+   standalone output, and starts the app under PM2.
+3. Subsequent deploys: `./deploy.sh` (applies any new migrations, rebuilds,
+   reloads PM2 with zero manual steps).
+4. `pm2 save && pm2 startup` once, so PM2 restarts the app on server reboot.
+5. Put Nginx in front: copy `deploy/nginx.example.conf`, adjust the domain
+   and the `/var/www/justx-cms` path, then
+   `sudo certbot --nginx -d justxsystems.com -d www.justxsystems.com` for
+   the Let's Encrypt certificate.
+
+`ecosystem.config.js` runs a single PM2 instance (matches the 1 vCPU / 4GB
+target and the in-memory rate limiter, which assumes one process) with a
+memory-restart threshold and log files under `logs/`.
 
 ## Environment variables
 
