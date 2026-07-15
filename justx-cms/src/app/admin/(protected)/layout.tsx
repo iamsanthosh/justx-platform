@@ -1,11 +1,14 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
 import AdminLogoutButton from "./LogoutButton";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
-  if (!session) redirect("/admin/login");
+  if (!session) {
+    // Note: Middleware handles redirects to /admin/login
+    // This shouldn't be reached, but just in case
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen bg-off">

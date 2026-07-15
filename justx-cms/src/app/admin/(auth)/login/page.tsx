@@ -15,18 +15,34 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError(null);
     try {
+      console.log("Login attempt:", { email });
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        credentials: "include",
       });
+      console.log("Login response status:", res.status);
+      
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        console.error("Login failed:", data);
         setError(data.error || "Login failed");
         return;
       }
-      router.push("/admin/dashboard");
-      router.refresh();
+      
+      const data = await res.json();
+      console.log("Login successful:", data);
+      
+      // Wait a bit to ensure cookie is processed
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Use window.location for a hard redirect to ensure new session is loaded
+      console.log("Redirecting to dashboard...");
+      window.location.href = "/admin/dashboard";
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
