@@ -41,6 +41,7 @@ export const serviceItemSchema = z.object({
   title: z.string().max(120),
   description: z.string().max(500),
   icon: z.string().max(60).optional(),
+  image: z.string().max(500).optional(),
   href: z.string().max(300).optional(),
 });
 export const servicesSchema = z.object({

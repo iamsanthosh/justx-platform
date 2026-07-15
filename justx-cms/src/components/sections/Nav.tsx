@@ -9,13 +9,17 @@ export interface NavItem {
   href: string;
 }
 
-export default function Nav({ items }: { items: NavItem[] }) {
+export default function Nav({ items, logoUrl }: { items: NavItem[]; logoUrl?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-ink/95 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <Link href="/" className="font-display text-lg text-white">
+        <Link href="/" className="flex items-center gap-2 font-display text-lg text-white">
+          {logoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="JustX Systems" className="h-8 w-8" />
+          )}
           JustX Systems
         </Link>
 

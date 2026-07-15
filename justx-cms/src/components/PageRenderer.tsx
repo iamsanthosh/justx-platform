@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPublishedPageBySlug, getMenu } from "@/lib/data/pages";
+import { getSetting } from "@/lib/data/settings";
 import Nav from "@/components/sections/Nav";
 import SectionRenderer from "@/components/sections/SectionRenderer";
 
@@ -22,10 +23,12 @@ export default async function PageRenderer({ slug }: { slug: string }) {
   if (!page) notFound();
 
   const navItems = await getMenu("primary-nav");
+  const logoUrl = ((await getSetting("logoUrl")) as string | null) || "/uploads/seed/logo.png";
 
   return (
     <>
       <Nav
+        logoUrl={logoUrl}
         items={
           navItems.length > 0
             ? navItems.map((i) => ({ label: i.label, href: i.href }))

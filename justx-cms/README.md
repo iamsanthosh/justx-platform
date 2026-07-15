@@ -268,6 +268,32 @@ npm run build        # Full production build — confirms the standalone output 
 
 ---
 
+## A real bug that was fixed (and what "matching the original" means here)
+
+An earlier delivery of this project had a genuine bug: the `Hero` component
+accepted an `images` field in its content schema but never actually rendered
+it — editing the JSON in the admin section editor had no visual effect
+because the code simply didn't read that field. That's fixed now: `Hero.tsx`
+renders an auto-rotating slideshow (`HeroSlideshow.tsx`) from the `images`
+array, and the seeded Home page uses the **actual photos extracted from your
+uploaded `justx_systems_website_v4.html`** (`public/uploads/seed/hero-1.jpg`,
+`hero-2.jpg`, `hero-3.jpg`) rather than empty placeholders. The real JustX
+logo was also extracted from that file (`public/uploads/seed/logo.png`) and
+now renders in the Nav and Footer — pulled from a `logoUrl` site setting
+(editable at `/admin/settings`), not hardcoded.
+
+Services cards now render real photography too (the same Unsplash images
+your original HTML linked to directly, referenced the same way rather than
+re-hosted).
+
+**What this does *not* claim**: full pixel-for-pixel parity with the
+original static HTML. The original file's CSS (animations, precise spacing,
+custom layout tricks) wasn't ported line-by-line — this is a genuine CMS
+rebuild using Tailwind utility classes with the same color tokens, not a
+re-skin of the old markup. If specific sections still look meaningfully
+different from the original, point me at which ones and I'll close the gap
+directly rather than leaving it as a general disclaimer.
+
 ## Getting it running (quick reference)
 
 If you've already done the full walkthrough above once and just need the

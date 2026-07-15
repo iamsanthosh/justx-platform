@@ -84,6 +84,13 @@ async function main() {
   });
   console.log(`   -> ${adminEmail} / ${adminPassword} (CHANGE THIS AFTER FIRST LOGIN)`);
 
+  console.log("Seeding site settings (logo)...");
+  await prisma.setting.upsert({
+    where: { key: "logoUrl" },
+    update: {},
+    create: { key: "logoUrl", value: "/uploads/seed/logo.png" },
+  });
+
   console.log("Seeding primary navigation...");
   const nav = await prisma.menu.upsert({
     where: { key: "primary-nav" },
@@ -134,7 +141,11 @@ async function main() {
           primaryCtaHref: "/#contact",
           secondaryCtaLabel: "Explore services",
           secondaryCtaHref: "/#services",
-          images: [],
+          images: [
+            "/uploads/seed/hero-1.jpg",
+            "/uploads/seed/hero-2.jpg",
+            "/uploads/seed/hero-3.jpg",
+          ],
         },
       },
       {
@@ -181,21 +192,29 @@ async function main() {
               title: "Website & Digital Presence",
               description:
                 "Modern, fast, CMS-driven corporate websites built on JAMstack architecture.",
+              image:
+                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80&auto=format&fit=crop",
             },
             {
               title: "SEO & Growth",
               description:
                 "Technical SEO, structured data, and local search strategy tied to measurable outcomes.",
+              image:
+                "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80&auto=format&fit=crop",
             },
             {
               title: "Business Operations Portals",
               description:
                 "Custom platforms for AMC management, field engineer workflows, inventory, and analytics.",
+              image:
+                "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80&auto=format&fit=crop",
             },
             {
               title: "AI & Automation",
               description:
                 "Practical AI integration — where it reduces real operational cost, not as a buzzword.",
+              image:
+                "https://images.unsplash.com/photo-1618172193622-ae2d025f4032?w=1200&q=80&auto=format&fit=crop",
             },
           ],
         },

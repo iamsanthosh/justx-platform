@@ -12,9 +12,19 @@ export default function Services({ content }: { content: ServicesContent }) {
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {content.items.map((item, i) => {
             const Card = (
-              <div className="h-full rounded bg-white p-6 shadow-sm transition hover:shadow-md">
-                <h3 className="font-medium text-ink">{item.title}</h3>
-                <p className="mt-2 text-sm text-body">{item.description}</p>
+              <div className="h-full overflow-hidden rounded bg-white shadow-sm transition hover:shadow-md">
+                {item.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="h-40 w-full object-cover"
+                  />
+                )}
+                <div className="p-6">
+                  <h3 className="font-medium text-ink">{item.title}</h3>
+                  <p className="mt-2 text-sm text-body">{item.description}</p>
+                </div>
               </div>
             );
             return item.href ? (

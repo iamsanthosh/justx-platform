@@ -15,6 +15,7 @@ const settingsSchema = z.object({
   siteTitle: z.string().min(1).max(150).optional(),
   siteDescription: z.string().max(300).optional(),
   defaultOgImage: z.string().optional(),
+  logoUrl: z.string().max(500).optional(),
   contactEmail: z.string().email().optional(),
   socialLinks: z
     .array(z.object({ platform: z.string(), href: z.string().url() }))

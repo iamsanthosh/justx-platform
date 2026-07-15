@@ -8,7 +8,7 @@ export const config = {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Auth routes (login) don't need session verification
+  // Login page itself must stay reachable.
   if (pathname === "/admin/login") {
     return NextResponse.next();
   }

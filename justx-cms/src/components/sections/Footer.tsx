@@ -1,13 +1,20 @@
 import Link from "next/link";
 import type { FooterContent } from "@/types/content";
+import { getSetting } from "@/lib/data/settings";
 
-export default function Footer({ content }: { content: FooterContent }) {
+export default async function Footer({ content }: { content: FooterContent }) {
+  const logoUrl = ((await getSetting("logoUrl")) as string | null) || "/uploads/seed/logo.png";
+
   return (
     <footer className="bg-ink text-white/70">
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 md:grid-cols-4">
           <div>
-            <span className="font-display text-xl text-white">JustX Systems</span>
+            <div className="flex items-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoUrl} alt="JustX Systems" className="h-8 w-8" />
+              <span className="font-display text-xl text-white">JustX Systems</span>
+            </div>
             {content.tagline && <p className="mt-3 text-sm">{content.tagline}</p>}
           </div>
           {content.groups.map((group, i) => (
