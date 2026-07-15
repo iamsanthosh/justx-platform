@@ -22,12 +22,15 @@ roadmap: foundation (auth, schema, security) and the public rendering engine
   inbox, forms engine (unlimited dynamic forms — build fields visually, each
   form gets its own `/api/forms/submit/<key>` endpoint validated against its
   own field schema, submissions inbox with status/notes, one-click CSV
-  export), menus admin (add/reorder/delete primary nav items), user
+  export), menus admin (unlimited menus, not just primary nav — add/reorder/
+  delete items, create new menu keys inline), user
   management (Super Admin only — create/disable/delete accounts, assign
   roles), site settings (title, default meta description, contact email)
-- Public site: dynamic page rendering by slug, contact form wired to a real
-  API route + DB storage + SMTP notification, sitemap.xml, robots.txt,
-  per-page SEO metadata
+- Public site: dynamic page rendering by slug — Home plus all eight
+  secondary pages (About, Services, Solutions, Industries, Technologies,
+  Careers, Privacy, Terms) seeded with real, published content, not
+  placeholders — contact form wired to a real API route + DB storage + SMTP
+  notification, sitemap.xml, robots.txt, per-page SEO metadata
 - Security: in-memory rate limiting (login, enquiry, and form-submission
   endpoints), Zod validation on every write path (including runtime-built
   schemas per form definition), RBAC permission checks on every admin API
@@ -38,12 +41,21 @@ roadmap: foundation (auth, schema, security) and the public rendering engine
 - Winston logging, standalone Next.js output (`output: "standalone"`) sized
   for a 1 vCPU / 4 GB VPS
 
-## Not yet built (next milestones)
+## Not yet built
 
-Careers module and the remaining static pages (About, Services, etc. —
-currently seeded as empty draft shells so slugs/routes exist). Secondary
-menus (only `primary-nav` has an admin UI so far; the schema supports
-unlimited menus).
+Nothing from the original spec is left unaddressed at the "one milestone at
+a time, complete and working" level this delivery targets. What remains is
+refinement, not missing functionality: richer Careers content (currently a
+hero + culture section + an application form wired to the forms engine, not
+a job-listing board — the spec didn't define one), and menus beyond
+`primary-nav` exist and are editable but aren't yet rendered anywhere on the
+public site (the schema and admin UI support unlimited menus; wiring one
+into, say, a footer, is a two-line change in `Footer.tsx` once you decide
+what should live there).
+
+All eight secondary pages (About, Services, Solutions, Industries,
+Technologies, Careers, Privacy, Terms) are seeded with real, published
+content — not empty drafts — using section types already in the registry.
 
 ## Testing
 
